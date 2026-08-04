@@ -1,0 +1,17 @@
+{
+  "name": "learning-it-skills-typescript",
+  "version": "1.0.0",
+  "description": "第11章「TypeScript の型」の実行できるサンプル",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel index.html --open",
+    "build": "parcel build index.html"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5",
+    "typescript": "^5.5.4"
+  }
+}
