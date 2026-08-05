@@ -1,0 +1,3 @@
+# protoc の生成物はコミットしない。make gen で誰でも作り直せる
+gen/
+bin/

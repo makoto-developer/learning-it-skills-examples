@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package link.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/example/linkshort/gen/link/v1;linkv1";
+
+// 短縮 URL サービス。
+service LinkService {
+  rpc CreateLink(CreateLinkRequest) returns (CreateLinkResponse);
+  rpc GetLink(GetLinkRequest) returns (GetLinkResponse);
+  rpc ListLinks(ListLinksRequest) returns (ListLinksResponse);
+}
+
+// 1本の短縮リンク。
+message Link {
+  // サーバーが採番する短縮キー。例: "aZ3k9Q"
+  string key = 1;
+  // 転送先の URL。http / https のみ受け付ける。
+  string url = 2;
+  google.protobuf.Timestamp create_time = 3;
+}
+
+message CreateLinkRequest {
+  string url = 1;
+}
+
+message CreateLinkResponse {
+  Link link = 1;
+}
+
+message GetLinkRequest {
+  string key = 1;
+}
+
+message GetLinkResponse {
+  Link link = 1;
+}
+
+message ListLinksRequest {
+  // 0 ならサーバー既定値(20)。上限は 100。
+  int32 page_size = 1;
+  // 前回の応答の next_page_token をそのまま渡す。中身は不透明。
+  string page_token = 2;
+}
+
+message ListLinksResponse {
+  repeated Link links = 1;
+  // 空文字なら最終ページ。
+  string next_page_token = 2;
+}

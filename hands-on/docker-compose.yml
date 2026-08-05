@@ -1,0 +1,11 @@
+services:
+  linkshort:
+    build: .
+    image: linkshort:dev
+    ports:
+      - "8080:8080"
+    environment:
+      ADDR: ":8080"
+    restart: unless-stopped
+    # distroless にはシェルが無いので healthcheck は書けない。
+    # 到達確認は外から curl するか、Kubernetes の probe に任せる。
