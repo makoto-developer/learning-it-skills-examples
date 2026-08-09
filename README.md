@@ -1,12 +1,12 @@
 # examples — 実行できるサンプル
 
-第4部（第11章 TypeScript / 第12章 Go）から埋め込むサンプルコードの**正本**です。
-CodeSandbox 上のコードが古くなった時は、こちらを正として直してください。
+第4部（TypeScript の型 / Go）から埋め込むサンプルコードの**正本**です。
+公開ミラーが古くなった時は、こちらを正として直し、subtree で押し出してください。
 
 | ディレクトリ | 対応する章 | 実行環境 |
 |---|---|---|
-| `typescript/` | 第11章 TypeScript の型 | ブラウザ内（読者が匿名のまま編集・再実行できる） |
-| `go/` | 第12章 Go | VM（読者は実行結果を見るだけ。編集には Fork が必要） |
+| `typescript/` | TypeScript の型 | **ブラウザ内で実行**（読者はログイン不要で編集・再実行できる） |
+| `go/` | Go | **埋め込みでは実行不可**。手元 or Go Playground |
 
 ## 手元で動かす
 
@@ -22,33 +22,41 @@ go run .
 go run -race .   # データ競合を検出する
 ```
 
-## CodeSandbox に載せる手順
+## 公開ミラーと CodeSandbox
 
-サンドボックスの作成はブラウザ上の操作が必要なので、そこだけ手作業です。
+**このディレクトリの正本はこのリポジトリ**で、公開ミラーへ subtree で押し出している。
 
-1. `examples/` を含むリポジトリを GitHub に push する
-2. CodeSandbox で **Import from GitHub** を実行し、`examples/typescript` と `examples/go`
-   をそれぞれサンドボックスにする
-3. エディタの **Share → Copy embed code** から URL を取り出す
-4. `content/sandboxes.ts` の `embedUrl` に貼る（コメントアウトを外す）
+| | 場所 |
+|---|---|
+| 正本 | このリポジトリの `examples/`（Private） |
+| 公開ミラー | https://github.com/makoto-developer/learning-it-skills-examples（Public） |
 
-`embedUrl` が未設定の間、本文には「準備中」と手元での動かし方が表示されます。
-ページが壊れることはないので、埋めるのは後からで構いません。
+サンプルを直したら、ミラーへ反映する。
 
-### 公開範囲の注意
+```bash
+git subtree push --prefix=examples examples main
+```
 
-埋め込みは**読者がログインなしで見られる**必要があります。
-CodeSandbox 側の公開設定を Public にしてください。
-Private のままだと、読者には何も表示されません。
+埋め込みは**公開ミラーを CodeSandbox に直接読ませる**形にしてある。
+サンドボックスを作る操作もアカウントも不要で、URL だけで完結する。
 
-### Go は編集できない
+```
+https://codesandbox.io/embed/github/makoto-developer/learning-it-skills-examples/tree/main/typescript
+```
 
-Go は VM Sandbox でしか動かず、その埋め込みでは**読者がコードを書き換えられません**
-（書き換えるには CodeSandbox 上で Fork が必要 = ログインが要る）。
+`content/books/intern/sandboxes.ts` の `embedUrl` がこれ。
+`module` パラメータで最初に開くファイルを指定できる（`<Sandbox module="/src/01-unknown.ts" />`）。
 
-読者に書き換えさせたい演習を Go で作る場合は、
-[Go Playground](https://go.dev/play/) の共有リンクを併用してください。
-ただし Playground では `-race` が使えないため、データ競合の演習は CodeSandbox 側に残します。
+### Go は埋め込みでは動かない
+
+ブラウザ内サンドボックスは Go を実行できない（**実機で確認済み**。
+コードは色付きで表示されるが、プレビューは空のまま）。
+実行するには VM Sandbox が必要で、その作成にはログインが要る。
+
+そのため Go の `embedUrl` は**意図的に空のまま**にしてある。
+本文には手元での動かし方と公開ミラーへのリンクが出る。
+ブラウザで書き換えて試させたい場合は、本文から
+[Go Playground](https://go.dev/play/) へ誘導する（`-race` は使えない）。
 
 ## サンプルを追加する時
 
