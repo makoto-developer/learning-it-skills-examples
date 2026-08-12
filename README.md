@@ -33,7 +33,7 @@ go run -race .      # データ競合を検出する
 | | 場所 |
 |---|---|
 | 正本 | このリポジトリの `examples/`（Private） |
-| 公開ミラー | https://github.com/makoto-developer/learning-it-skills-examples（Public） |
+| 公開ミラー | [learning-it-skills-examples](https://github.com/makoto-developer/learning-it-skills-examples)（Public） |
 
 サンプルを直したら、ミラーへ反映します。
 
