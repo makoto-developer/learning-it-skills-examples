@@ -17,6 +17,36 @@
 
 すべて **Kubernetes（kind）の上**で動き、**スキーマは Terraform** で作ります。
 
+## セットアップ
+
+### asdf か mise を使っている場合（推奨）
+
+`.tool-versions` を置いてあるので、**1コマンドで揃います**。
+
+```bash
+cd examples/microservices
+mise install      # asdf を使っているなら asdf install
+```
+
+これで Go・Node・pnpm・Terraform・kind・kubectl・buf・grpcurl が
+このディレクトリの中だけ指定のバージョンに切り替わります。
+手元の他のプロジェクトのバージョンには影響しません。
+
+```bash
+mise ls --current   # 何がどのバージョンで解決されているか確認する
+```
+
+**Docker だけは別途インストールが必要**です（Desktop / Colima / OrbStack のいずれか）。
+バージョン管理ツールの対象外なので、ここだけ手で入れてください。
+
+<!-- asdf は node/go のプラグイン名が nodejs/golang。mise はどちらの表記も受け付けるため、
+     .tool-versions は asdf 側の名前で書いている -->
+
+### 使っていない場合
+
+下の表のバージョンを目安に、それぞれ入れてください。
+**バージョンが多少違っても動きます**が、大きく古いと動かないことがあります。
+
 ## 必要な環境
 
 ### 必須
@@ -51,14 +81,21 @@
 
 ### 使うポート
 
-| ポート | 用途 |
-|---|---|
-| **18080** | kind から公開する BFF の入口。**8080 は他ツールと衝突しやすいので避けている** |
-| 9010 / 9020 | Spanner エミュレータ（`make emulator` で手元に立てた時のみ） |
-| 8080 / 3000 | Kubernetes を使わず直接動かす時の link / BFF |
+| ポート | 用途 | 変えるところ |
+|---|---|---|
+| **19080** | kind から公開する BFF の入口 | `kind/cluster.yaml` の `hostPort` と `Makefile` の `HOST_PORT`（**両方**） |
+| 19000 | 直接動かす時の BFF | `Makefile` の `BFF_PORT` |
+| 19001 | 直接動かす時の link（gRPC） | `Makefile` の `LINK_PORT` |
+| 9010 / 9020 | Spanner エミュレータ | `Makefile` の `EMULATOR` 周り |
 
-既に使っているポートがある場合は、`kind/cluster.yaml` の `hostPort` と
-`Makefile` の `HOST_PORT` を合わせて変えてください。
+**3000 / 8080 / 18000 番台を避けているのは、実際に衝突したから**です
+（別プロジェクトのコンテナ、`kubectl port-forward` など）。
+
+埋まっているかは次で確認できます。
+
+```bash
+lsof -nP -iTCP:19080 -sTCP:LISTEN     # 何も出なければ空き
+```
 
 ### 必要ないもの
 
@@ -82,16 +119,16 @@ make deploy     # エミュレータ → Terraform → link → bff の順に載
 make smoke      # 一通り叩いて確かめる
 ```
 
-`make deploy` が終わると <http://localhost:18080> で使えます。
+`make deploy` が終わると <http://localhost:19080> で使えます。
 
 ```bash
-curl -X POST localhost:18080/links \
+curl -X POST localhost:19080/links \
   -H 'content-type: application/json' \
   -d '{"url":"https://example.com/very/long/url"}'
 # {"key":"9jjbqVZ","url":"https://example.com/very/long/url"}
 
-curl -i localhost:18080/9jjbqVZ     # 302 で転送される
-curl 'localhost:18080/links?page_size=5'
+curl -i localhost:19080/9jjbqVZ     # 302 で転送される
+curl 'localhost:19080/links?page_size=5'
 ```
 
 後片付けは `make down` です。
@@ -104,13 +141,13 @@ curl 'localhost:18080/links?page_size=5'
 make emulator   # 1つ目: Spanner エミュレータ
 make schema     # スキーマを作る（Terraform）
 
-make run-link   # 2つ目: Go の gRPC サーバー（:8080）
-make run-bff    # 3つ目: TypeScript の BFF（:3000）
+make run-link   # 2つ目: Go の gRPC サーバー（:19001）
+make run-bff    # 3つ目: TypeScript の BFF（:19000）
 ```
 
 ```bash
-curl -X POST localhost:3000/links -H 'content-type: application/json' -d '{"url":"https://example.com"}'
-grpcurl -plaintext localhost:8080 list          # gRPC を直接見る
+curl -X POST localhost:19000/links -H 'content-type: application/json' -d '{"url":"https://example.com"}'
+grpcurl -plaintext localhost:19001 list         # gRPC を直接見る
 ```
 
 ## テスト

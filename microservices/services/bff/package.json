@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "tsx src/main.ts",
+    "build": "tsc",
+    "start": "pnpm build && node dist/main.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -13,12 +14,6 @@
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
-    "tsx": "^4.19.2",
     "typescript": "^5.9.3"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }

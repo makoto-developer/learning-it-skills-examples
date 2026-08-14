@@ -6,7 +6,10 @@ CLUSTER   := learning
 DATABASE  := projects/learning-project/instances/learning-instance/databases/links
 EMULATOR  := gcr.io/cloud-spanner-emulator/emulator:latest
 # kind から公開するホスト側のポート。8080 は他と衝突しやすいので避けている
-HOST_PORT := 18080
+HOST_PORT := 19080
+# 手元で直接動かす時のポート。3000 / 8080 は他のツールと衝突しやすいので避けている
+LINK_PORT := 19001
+BFF_PORT  := 19000
 
 .PHONY: help
 help: ## このヘルプを出す
@@ -35,11 +38,12 @@ generate: ## .proto から Go と TypeScript のコードを生成する
 .PHONY: run-link
 run-link: ## link サービス（Go / gRPC）を起動する
 	SPANNER_EMULATOR_HOST=localhost:9010 SPANNER_DATABASE=$(DATABASE) \
-		go run ./services/link/cmd/server
+		LISTEN_ADDR=:$(LINK_PORT) go run ./services/link/cmd/server
 
 .PHONY: run-bff
 run-bff: ## BFF（TypeScript / HTTP）を起動する
-	cd services/bff && LINK_SERVICE_URL=http://localhost:8080 pnpm start
+	cd services/bff && pnpm install --ignore-workspace && \
+		LINK_SERVICE_URL=http://localhost:$(LINK_PORT) PORT=$(BFF_PORT) pnpm start
 
 .PHONY: test
 test: ## Go のテストを走らせる（Spanner の結合テストはスキップされる）

@@ -7,5 +7,5 @@ nodes:
       # ホストの 18080 を BFF の NodePort へ流す。
       # 8080 は他のツールと衝突しやすいので、あえて外している
       - containerPort: 30080
-        hostPort: 18080
+        hostPort: 19080
         protocol: TCP

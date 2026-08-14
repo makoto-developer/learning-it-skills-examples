@@ -1,0 +1,13 @@
+# 通しハンズオンで使うツール一式。
+#
+#   mise install     （または asdf install）
+#
+# Docker だけは別途インストールが必要（Desktop / Colima / OrbStack のいずれか）。
+golang 1.25.1
+nodejs 24.9.0
+pnpm 11.15.1
+terraform 1.15.8
+kind 0.32.0
+kubectl 1.36.1
+buf 1.72.0
+grpcurl 1.9.3
