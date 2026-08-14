@@ -1,0 +1,11 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: learning
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      # ホストの 18080 を BFF の NodePort へ流す。
+      # 8080 は他のツールと衝突しやすいので、あえて外している
+      - containerPort: 30080
+        hostPort: 18080
+        protocol: TCP

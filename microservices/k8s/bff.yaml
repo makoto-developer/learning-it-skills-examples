@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: bff }
+  template:
+    metadata:
+      labels: { app: bff }
+    spec:
+      containers:
+        - name: server
+          image: learning/bff:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - { name: http, containerPort: 3000 }
+          env:
+            # サービス名で名前解決できる。localhost ではない
+            - { name: LINK_SERVICE_URL, value: "http://link:8080" }
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 2
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 10
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { memory: 256Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bff
+spec:
+  type: NodePort
+  selector: { app: bff }
+  ports:
+    # kind の extraPortMappings と合わせる。ホストの :8080 から入れるようになる
+    - { port: 3000, targetPort: http, nodePort: 30080 }

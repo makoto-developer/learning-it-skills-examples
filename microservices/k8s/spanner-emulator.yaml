@@ -1,0 +1,32 @@
+# 本番では GCP の Spanner を使う。学習用にエミュレータをクラスタ内に置く
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spanner-emulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: spanner-emulator }
+  template:
+    metadata:
+      labels: { app: spanner-emulator }
+    spec:
+      containers:
+        - name: emulator
+          image: gcr.io/cloud-spanner-emulator/emulator:latest
+          ports:
+            - { name: grpc, containerPort: 9010 }
+            - { name: rest, containerPort: 9020 }
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 1Gi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spanner-emulator
+spec:
+  selector: { app: spanner-emulator }
+  ports:
+    - { name: grpc, port: 9010, targetPort: grpc }
+    - { name: rest, port: 9020, targetPort: rest }

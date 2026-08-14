@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: link
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: link }
+  template:
+    metadata:
+      labels: { app: link }
+    spec:
+      containers:
+        - name: server
+          image: learning/link:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - { name: grpc, containerPort: 8080 }
+          env:
+            # エミュレータを使う時だけ設定する。本番では外し、Workload Identity で認証する
+            - { name: SPANNER_EMULATOR_HOST, value: "spanner-emulator:9010" }
+            - { name: SPANNER_DATABASE, value: "projects/learning-project/instances/learning-instance/databases/links" }
+          readinessProbe:
+            grpc: { port: 8080 }
+            initialDelaySeconds: 2
+          livenessProbe:
+            grpc: { port: 8080 }
+            initialDelaySeconds: 10
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { memory: 256Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: link
+spec:
+  selector: { app: link }
+  ports:
+    - { port: 8080, targetPort: grpc }
