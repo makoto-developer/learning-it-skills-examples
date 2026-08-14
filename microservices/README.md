@@ -113,13 +113,32 @@ curl -X POST localhost:3000/links -H 'content-type: application/json' -d '{"url"
 grpcurl -plaintext localhost:8080 list          # gRPC を直接見る
 ```
 
+## テスト
+
+```bash
+make test              # 保存先をメモリに差し替えた単体テスト。数秒で終わる
+make test-integration  # Spanner エミュレータに対する結合テストも走らせる
+```
+
+`make test` は**エミュレータが無くても通ります**。
+Spanner に対するテストは `SPANNER_EMULATOR_HOST` が無ければスキップされるためです。
+
+| 何をテストしているか | どこ |
+|---|---|
+| URL の検証、キーの衝突と再採番、ページング、エラーコードの対応 | `services/link/internal/server/server_test.go` |
+| ページトークンの往復と、中身が透けないこと | `services/link/internal/server/token_internal_test.go` |
+| Spanner の commit timestamp、重複、並び順 | `services/link/internal/store/spanner_integration_test.go` |
+
+**メモリ実装で通っても Spanner で通るとは限りません**（型の制約、commit timestamp、
+クエリの書き方）。そこは結合テストで押さえています。
+
 ## ディレクトリ
 
 ```
 proto/link/v1/link.proto   API の定義。ここが2つのサービスの契約
 buf.yaml / buf.gen.yaml    生成の設定（Go と TypeScript の両方を出す）
 gen/                       Go の生成コード（コミットしている。理由は下記）
-services/link/             Go: gRPC サーバー + Spanner
+services/link/             Go: gRPC サーバー + Spanner（テストもここ）
 services/bff/              TypeScript: HTTP → gRPC
 terraform/                 Spanner のインスタンスとテーブル
 k8s/                       Kubernetes のマニフェスト

@@ -44,7 +44,7 @@ func run() error {
 	defer spannerStore.Close()
 
 	grpcServer := grpc.NewServer()
-	linkv1.RegisterLinkServiceServer(grpcServer, server.New(spannerStore))
+	linkv1.RegisterLinkServiceServer(grpcServer, server.New(server.Config{Store: spannerStore}))
 
 	// kubelet の probe と grpcurl のために足しておく
 	healthv1.RegisterHealthServer(grpcServer, health.NewServer())

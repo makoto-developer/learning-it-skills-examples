@@ -33,12 +33,27 @@ type Store interface {
 	List(ctx context.Context, limit int, after time.Time) ([]store.Link, error)
 }
 
-type Server struct {
-	linkv1.UnimplementedLinkServiceServer
-	store Store
+// Config は依存を外から渡すための入れ物。
+// キーの採番を差し替えられるようにしているのは、テストで衝突を再現するため。
+type Config struct {
+	Store Store
+	// 省略時は crypto/rand を使う
+	NewKey func() (string, error)
 }
 
-func New(s Store) *Server { return &Server{store: s} }
+type Server struct {
+	linkv1.UnimplementedLinkServiceServer
+	store  Store
+	newKey func() (string, error)
+}
+
+func New(cfg Config) *Server {
+	newKey := cfg.NewKey
+	if newKey == nil {
+		newKey = randomKey
+	}
+	return &Server{store: cfg.Store, newKey: newKey}
+}
 
 func (s *Server) CreateLink(ctx context.Context, req *linkv1.CreateLinkRequest) (*linkv1.CreateLinkResponse, error) {
 	if err := validateURL(req.GetUrl()); err != nil {
@@ -46,7 +61,7 @@ func (s *Server) CreateLink(ctx context.Context, req *linkv1.CreateLinkRequest) 
 	}
 
 	for attempt := range createRetries {
-		key, err := newKey()
+		key, err := s.newKey()
 		if err != nil {
 			return nil, status.Error(codes.Internal, "キーを採番できませんでした")
 		}
@@ -140,7 +155,7 @@ func validateURL(raw string) error {
 	return nil
 }
 
-func newKey() (string, error) {
+func randomKey() (string, error) {
 	buf := make([]byte, keyLength)
 	if _, err := rand.Read(buf); err != nil {
 		return "", err

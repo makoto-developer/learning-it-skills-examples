@@ -42,8 +42,16 @@ run-bff: ## BFF（TypeScript / HTTP）を起動する
 	cd services/bff && LINK_SERVICE_URL=http://localhost:8080 pnpm start
 
 .PHONY: test
-test: ## Go のテストを走らせる
+test: ## Go のテストを走らせる（Spanner の結合テストはスキップされる）
 	go test ./...
+
+.PHONY: test-integration
+test-integration: ## Spanner エミュレータに対する結合テストも走らせる（先に make emulator && make schema）
+	SPANNER_EMULATOR_HOST=localhost:9010 go test ./... -count=1
+
+.PHONY: test-bff
+test-bff: ## BFF の型検査
+	cd services/bff && pnpm typecheck
 
 ## ---- Kubernetes（kind）で動かす ----
 
