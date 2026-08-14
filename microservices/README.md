@@ -36,9 +36,10 @@ mise install      # asdf を使っているなら asdf install
 mise ls --current   # 何がどのバージョンで解決されているか確認する
 ```
 
-**`mise activate` をシェルに入れていない場合、`make` の中まで切り替わりません**
-（`make` が起動するシェルには mise の PATH が渡らないため）。
-その場合は shims を PATH に足してください。
+シェルで有効にしてあれば（`mise activate` を `.zshrc` などに入れてあれば）、
+`make` の中で動くコマンドまで同じバージョンに揃います。
+
+CI など mise を有効化できない場所では、shims を PATH に足すのが確実です。
 
 ```bash
 export PATH="$HOME/.local/share/mise/shims:$PATH"
