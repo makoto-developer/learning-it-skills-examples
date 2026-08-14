@@ -43,10 +43,18 @@ function toHttpStatus(error: unknown): number {
   }
 }
 
+/** 接続できない時など、上流のメッセージが空になることがある。空のまま返さない */
+function messageFor(error: unknown, status: number): string {
+  if (error instanceof ConnectError && error.rawMessage !== '') return error.rawMessage;
+  if (status === 503) return '一時的に利用できません。時間をおいて再度お試しください';
+  return '内部エラーが発生しました';
+}
+
 function fail(res: ServerResponse, error: unknown): void {
   const status = toHttpStatus(error);
-  const message = error instanceof ConnectError ? error.rawMessage : '内部エラーが発生しました';
-  console.error(JSON.stringify({ level: 'error', status, message }));
+  const message = messageFor(error, status);
+  // 利用者に返す文面と、ログに残す詳細は分ける
+  console.error(JSON.stringify({ level: 'error', status, message, detail: String(error) }));
   send(res, status, { error: message });
 }
 
