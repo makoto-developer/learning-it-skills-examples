@@ -35,8 +35,8 @@ func run() error {
 	defer stop()
 
 	database := env("SPANNER_DATABASE", "projects/learning-project/instances/learning-instance/databases/links")
-	// 既定値は衝突しにくい番号にしてある。Kubernetes 上では 8080 を渡す
-	addr := env("LISTEN_ADDR", ":19001")
+	// 既定は 8080。手元で直接動かす時は Makefile が別のポートを渡す
+	addr := env("LISTEN_ADDR", ":8080")
 
 	spannerStore, err := store.NewSpanner(ctx, database)
 	if err != nil {

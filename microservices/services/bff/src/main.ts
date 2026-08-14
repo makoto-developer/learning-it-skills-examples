@@ -9,9 +9,9 @@ import { Code, ConnectError, createClient, type Client } from '@connectrpc/conne
 import { createGrpcTransport } from '@connectrpc/connect-node';
 import { LinkService } from './gen/link/v1/link_pb.js';
 
-// 既定値は衝突しにくい番号にしてある。3000 や 8080 は他のツールと当たりやすい
-const LINK_SERVICE_URL = process.env['LINK_SERVICE_URL'] ?? 'http://localhost:19001';
-const PORT = Number(process.env['PORT'] ?? 19000);
+// 既定は Kubernetes 上での値。手元で直接動かす時は Makefile が別のポートを渡す
+const LINK_SERVICE_URL = process.env['LINK_SERVICE_URL'] ?? 'http://link:8080';
+const PORT = Number(process.env['PORT'] ?? 3000);
 
 const transport = createGrpcTransport({ baseUrl: LINK_SERVICE_URL });
 const links: Client<typeof LinkService> = createClient(LinkService, transport);

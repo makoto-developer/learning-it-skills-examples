@@ -17,6 +17,8 @@ spec:
           ports:
             - { name: grpc, containerPort: 8080 }
           env:
+            # 待ち受けポートは明示する。既定値に依存すると、変えた時に probe とずれる
+            - { name: LISTEN_ADDR, value: ":8080" }
             # エミュレータを使う時だけ設定する。本番では外し、Workload Identity で認証する
             - { name: SPANNER_EMULATOR_HOST, value: "spanner-emulator:9010" }
             - { name: SPANNER_DATABASE, value: "projects/learning-project/instances/learning-instance/databases/links" }

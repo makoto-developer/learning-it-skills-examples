@@ -17,6 +17,7 @@ spec:
           ports:
             - { name: http, containerPort: 3000 }
           env:
+            - { name: PORT, value: "3000" }
             # サービス名で名前解決できる。localhost ではない
             - { name: LINK_SERVICE_URL, value: "http://link:8080" }
           readinessProbe:
