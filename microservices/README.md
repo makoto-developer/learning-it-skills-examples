@@ -36,6 +36,14 @@ mise install      # asdf を使っているなら asdf install
 mise ls --current   # 何がどのバージョンで解決されているか確認する
 ```
 
+**`mise activate` をシェルに入れていない場合、`make` の中まで切り替わりません**
+（`make` が起動するシェルには mise の PATH が渡らないため）。
+その場合は shims を PATH に足してください。
+
+```bash
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+```
+
 **Docker だけは別途インストールが必要**です（Desktop / Colima / OrbStack のいずれか）。
 バージョン管理ツールの対象外なので、ここだけ手で入れてください。
 
