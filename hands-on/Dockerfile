@@ -1,5 +1,5 @@
 # --- 1段目: ビルドだけを行う。Go ツールチェインは成果物に持ち込まない ---
-FROM golang:1.24-alpine AS build
+FROM golang:1.27-alpine AS build
 
 WORKDIR /src
 

@@ -1,3 +1,3 @@
 module learning-it-skills/examples
 
-go 1.23
+go 1.27
