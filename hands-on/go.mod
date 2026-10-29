@@ -1,3 +1,3 @@
 module github.com/example/linkshort
 
-go 1.24
+go 1.27

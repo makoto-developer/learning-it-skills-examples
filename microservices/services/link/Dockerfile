@@ -1,5 +1,5 @@
 # ビルド用と実行用を分ける（マルチステージ）。実行用に Go のツールチェーンは要らない
-FROM golang:1.25-alpine AS build
+FROM golang:1.27-alpine AS build
 WORKDIR /src
 
 # 依存だけ先に入れる。ソースを変えてもここのレイヤーは再利用される
